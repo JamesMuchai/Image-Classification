@@ -133,3 +133,7 @@ miniconda3/
 .conda/
 *.conda
 *.ipynb_checkpoints
+.DS_Store
+Assets/
+
+*.pth
