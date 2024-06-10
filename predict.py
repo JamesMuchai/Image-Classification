@@ -90,8 +90,21 @@ def process_image(image_path):
     tr_img = np.transpose(norm_image, (2, 0, 1))
     
     return tr_img
+def check_gpu():
+    """
+    Check for available GPU and return the appropriate device.
+    
+    Returns:
+    - torch.device: The device to use (cuda, mps, or cpu).
+    """
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        return torch.device("mps")
+    else:
+        return torch.device("cpu")
 
-def predict(image_path, model, topk=3):
+def predict(image_path, model, topk=3, device):
     """
     Predict the class (or classes) of an image using a trained deep learning model.
 
@@ -103,7 +116,7 @@ def predict(image_path, model, topk=3):
     Returns:
     - tuple: The top probabilities and corresponding classes.
     """
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
     model.to(device)
    
     # Process the image
@@ -141,10 +154,16 @@ def format_output(probs, classes, json_dict, label_index):
 
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
 
+
+
 if __name__ == '__main__':
     # Parse input arguments
     inputs = parse_input()
-    
+    # Check for GPU if requested
+    if inputs.gpu:
+        device = check_gpu()
+    else: 
+        device = torch.device("cpu")
     # Load label names from JSON file
     label_dict = read_label_names(inputs.category_names)
     
@@ -155,7 +174,7 @@ if __name__ == '__main__':
     label_index = {v: k for k, v in model.class_to_idx.items()}
     
     # Predict the top classes
-    probs, classes = predict(inputs.filename, model, inputs.topk)
+    probs, classes = predict(inputs.filename, model, inputs.topk, device)
     
     # Format and display the output
     format_output(probs, classes, label_dict, label_index)
