@@ -104,7 +104,7 @@ def check_gpu():
     else:
         return torch.device("cpu")
 
-def predict(image_path, model, topk=3, device):
+def predict(image_path, model,device, topk=3):
     """
     Predict the class (or classes) of an image using a trained deep learning model.
 
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     label_index = {v: k for k, v in model.class_to_idx.items()}
     
     # Predict the top classes
-    probs, classes = predict(inputs.filename, model, inputs.topk, device)
+    probs, classes = predict(inputs.filename, model, device  inputs.topk)
     
     # Format and display the output
     format_output(probs, classes, label_dict, label_index)
